@@ -493,6 +493,16 @@
                         <tbody id="makhdomin-table-body"></tbody>
                     </table>
                 </div>
+
+                <!-- زرار ترقية الموسم -->
+                <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--card-border); text-align: center;">
+                    <button class="btn btn-primary" style="background-color: #8b5cf6;" onclick="window.promoteStages()">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> تحديث الموسم ونقل المخدومين تلقائياً
+                    </button>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px;">
+                        يقوم هذا الزر بنقل المخدومين للمراحل الجديدة بناءً على سنة الميلاد (يتطلب كلمة سر)
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -632,7 +642,6 @@
 
     <script>
         (function() {
-            // تهيئة إعدادات وربط Firebase
             const firebaseConfig = {
               apiKey: "AIzaSyC_as9D16zvCFqKUIjizPcBx1VIqYqvqmc",
               authDomain: "scout-app-ae.firebaseapp.com",
@@ -660,7 +669,6 @@
                 attendance: []
             };
 
-            // دالة للتحقق هل المخدوم سجل حضور خلال الـ 7 أيام الماضية أم لا
             function isAttendedInLast7Days(makhdomId) {
                 const now = new Date().getTime();
                 const atts = localCache.attendance.filter(a => a.makhdomId === makhdomId);
@@ -670,7 +678,6 @@
                 });
             }
 
-            // Real-time synchronization from Firestore
             function initRealtimeSync() {
                 db.collection(COLLECTION_MAKHDOMIN).onSnapshot(snapshot => {
                     localCache.makhdomin = [];
@@ -697,7 +704,6 @@
                 }, err => console.error("Attendance Sync Error:", err));
             }
 
-            // Global Tab Switcher
             window.switchTab = function(tabId, el) {
                 document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
                 document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -862,6 +868,62 @@
                 }
             };
 
+            // ========== تحديث الموسم بناءً على سنة الميلاد فقط ========== //
+            window.promoteStages = function() {
+                const password = prompt("هذا الإجراء مخصص للقادة فقط. برجاء إدخال كلمة المرور لتأكيد تحديث الموسم:", "");
+                
+                if (password !== "5684") {
+                    if (password !== null) alert("كلمة المرور غير صحيحة. تم إلغاء العملية.");
+                    return;
+                }
+
+                if (!confirm("هل أنت متأكد من مراجعة ونقل جميع المخدومين للمراحل الجديدة؟\n(لن يتم تغيير الأكواد أو الأرقام الخاصة بهم)")) {
+                    return;
+                }
+
+                const mList = localCache.makhdomin;
+                let updatedCount = 0;
+
+                mList.forEach(m => {
+                    if (!m.dob) return;
+
+                    const currentYear = new Date().getFullYear();
+                    const dob = new Date(m.dob);
+                    
+                    if (isNaN(dob.getTime())) return;
+
+                    // حساب العمر بناءً على سنة الميلاد فقط لضمان ترقية الدفعة كاملة معاً
+                    let age = currentYear - dob.getFullYear();
+
+                    let newStage = m.stage;
+                    
+                    if (age <= 7) { 
+                        newStage = "براعم";
+                    } else if (age >= 8 && age <= 9) {
+                        newStage = "أشبال (أ)";
+                    } else if (age >= 10 && age <= 11) {
+                        newStage = "أشبال (ب)";
+                    } else if (age >= 12 && age <= 14) {
+                        newStage = "كشاف";
+                    } else if (age >= 15 && age <= 17) {
+                        newStage = "متقدم";
+                    } else if (age >= 18) {
+                        newStage = "جوالة";
+                    }
+
+                    if (newStage !== m.stage) {
+                        db.collection(COLLECTION_MAKHDOMIN).doc(m.id).update({
+                            stage: newStage
+                        }).catch(err => console.error("خطأ في النقل:", err));
+                        
+                        updatedCount++;
+                    }
+                });
+
+                alert(`تم بنجاح! تم نقل ${updatedCount} مخدوم لمراحلهم الجديدة.\n(الإحصائيات والعدادات سيتم تحديثها تلقائياً الآن).`);
+            };
+            // ==================================================== //
+
             window.renderAll = function() {
                 try {
                     renderStats();
@@ -879,7 +941,6 @@
                 const mList = localCache.makhdomin;
                 const kList = localCache.khodam;
                 
-                // حساب إجمالي الحاضرين في الخدمة خلال آخر 7 أيام لجميع المراحل
                 const activeWeeklyAttendance = mList.filter(m => isAttendedInLast7Days(m.id)).length;
 
                 document.getElementById('stat-makhdomin-count').innerText = mList.length;
@@ -987,7 +1048,6 @@
                 if (!container) return;
                 const nowTime = new Date().getTime();
                 
-                // عرض التسجيلات التي تمت خلال الـ 7 أيام الأخيرة فقط
                 const recentLogs = localCache.attendance.filter(a => {
                     const t = new Date(a.date).getTime();
                     return !isNaN(t) && (nowTime - t < SEVEN_DAYS_MS);
@@ -1031,7 +1091,6 @@
                 const nowTime = new Date().getTime();
                 const sevenDaysAgo = nowTime - SEVEN_DAYS_MS;
 
-                // المخدومين الغائبين هم من لم يسجلوا حضور خلال الـ 7 أيام الماضية
                 const absentItems = mList.filter(m => {
                     const stageMatch = (filterStage === 'ALL' || m.stage === filterStage);
                     const attendedRecently = isAttendedInLast7Days(m.id);
@@ -1096,31 +1155,4 @@
                 }
 
                 if (doneList.length === 0) {
-                    doneContainer.innerHTML = `<p style="color:var(--text-muted); text-align:center; font-size:0.85rem; padding:8px 0;">لا توجد سجلات إفتقاد مكتملة مؤخراً.</p>`;
-                } else {
-                    doneList.forEach(item => {
-                        const m = item.m;
-                        doneContainer.innerHTML += `
-                            <div style="background-color:var(--bg-dark); border:1px solid var(--card-border); border-radius:8px; padding:12px; margin-bottom:10px; opacity:0.85;">
-                                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-                                    <div>
-                                        <strong>${m.name}</strong>
-                                        <div style="font-size:0.8rem; color:var(--text-muted);">${m.stage} - هاتف: ${m.phone || 'غير مسجل'}</div>
-                                    </div>
-                                    <span class="badge" style="background-color:var(--success);">تم الإفتقاد <i class="fa-solid fa-check"></i></span>
-                                </div>
-                                <div style="font-size:0.75rem; color:var(--accent-blue);">
-                                    ${item.lastLogText}
-                                </div>
-                            </div>
-                        `;
-                    });
-                }
-            };
-
-            // Init Realtime Cloud Connection Execution
-            initRealtimeSync();
-        })();
-    </script>
-</body>
-</html>
+                    doneContainer.innerHTML = `<p style="color:var(--text-muted); text-align:center; font-size:0.85
