@@ -1155,4 +1155,30 @@
                 }
 
                 if (doneList.length === 0) {
-                    doneContainer.innerHTML = `<p style="color:var(--text-muted); text-align:center; font-size:0.85
+                    doneContainer.innerHTML = `<p style="color:var(--text-muted); text-align:center; font-size:0.85rem; padding:8px 0;">لا توجد سجلات إفتقاد مكتملة مؤخراً.</p>`;
+                } else {
+                    doneList.forEach(item => {
+                        const m = item.m;
+                        doneContainer.innerHTML += `
+                            <div style="background-color:var(--bg-dark); border:1px solid var(--card-border); border-radius:8px; padding:12px; margin-bottom:10px; opacity:0.85;">
+                                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                                    <div>
+                                        <strong>${m.name}</strong>
+                                        <div style="font-size:0.8rem; color:var(--text-muted);">${m.stage} - هاتف: ${m.phone || 'غير مسجل'}</div>
+                                    </div>
+                                    <span class="badge" style="background-color:var(--success);">تم الإفتقاد <i class="fa-solid fa-check"></i></span>
+                                </div>
+                                <div style="font-size:0.75rem; color:var(--accent-blue);">
+                                    ${item.lastLogText}
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            };
+
+            initRealtimeSync();
+        })();
+    </script>
+</body>
+</html>
