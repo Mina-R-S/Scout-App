@@ -1,0 +1,1894 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>كشافة العذراء والأنبا أبرام</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --primary-blue: #2563eb;
+            --accent-blue: #38bdf8;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --danger: #ef4444;
+            --success: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            padding-bottom: 90px;
+        }
+
+        .header-bar {
+            background-color: var(--card-bg);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--card-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-status {
+            background-color: rgba(56, 189, 248, 0.15);
+            color: var(--accent-blue);
+            border: 1px solid var(--accent-blue);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .cover-banner {
+            width: 100%;
+            background: linear-gradient(135deg, #1e3a8a, #0284c7);
+            padding: 24px 16px;
+            text-align: center;
+            border-radius: 0 0 16px 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .cover-banner h1 {
+            font-size: 1.3rem;
+            margin-bottom: 4px;
+        }
+
+        .cover-banner p {
+            color: var(--accent-blue);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .container {
+            padding: 0 16px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 14px;
+            position: relative;
+        }
+
+        .stat-icon {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        .stat-title {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .stat-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .section-block {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .form-control, .form-select {
+            width: 100%;
+            padding: 10px 12px;
+            background-color: var(--bg-dark);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-blue);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-blue);
+            color: #fff;
+        }
+
+        .btn-action {
+            width: auto;
+            padding: 6px 10px;
+            font-size: 0.75rem;
+            border-radius: 6px;
+        }
+
+        .btn-danger { background-color: var(--danger); color: #fff; }
+        .btn-whatsapp { background-color: #25d366; color: #fff; }
+        .btn-call { background-color: #3b82f6; color: #fff; }
+        .btn-visit { background-color: #8b5cf6; color: #fff; }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.85rem;
+        }
+
+        .data-table th, .data-table td {
+            padding: 10px;
+            text-align: right;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .data-table th {
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            background-color: #334155;
+            color: var(--text-main);
+        }
+
+        .search-result-item {
+            background-color: var(--bg-dark);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.75);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--card-border);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            text-decoration: none;
+            cursor: pointer;
+            width: 20%;
+        }
+
+        .nav-item i {
+            font-size: 1.1rem;
+            margin-bottom: 3px;
+        }
+
+        .nav-item.active {
+            color: var(--accent-blue);
+        }
+
+        .page { display: none; }
+        .page.active { display: block; }
+
+        #auth-gate{position:fixed;inset:0;z-index:99999;background:#0f172a;display:flex;align-items:center;justify-content:center;padding:20px}
+        #auth-card{width:min(100%,420px);background:#1e293b;border:1px solid #334155;border-radius:18px;padding:24px;box-shadow:0 20px 60px #0008}
+        #auth-card h2{margin:0 0 8px;color:#f8fafc} #auth-card p{color:#94a3b8;line-height:1.7;margin-bottom:16px}
+        #auth-card label{display:block;margin:12px 0 6px;color:#cbd5e1} #auth-card input{width:100%;padding:12px;border-radius:8px;border:1px solid #475569;background:#0f172a;color:#fff}
+        #auth-login-btn{width:100%;margin-top:16px;padding:12px;border:0;border-radius:8px;background:#2563eb;color:white;font-weight:700;cursor:pointer}
+        #auth-message{margin-top:12px;color:#fca5a5;line-height:1.6;white-space:pre-wrap}
+        #auth-logout-btn{position:fixed;top:12px;left:12px;z-index:10000;padding:8px 12px;background:#991b1b;color:#fff;border:0;border-radius:8px;cursor:pointer;display:none}
+    </style>
+</head>
+<body>
+
+    <div id="auth-gate" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+      <div id="auth-card">
+        <h2 id="auth-title">دخول إدارة الكشافة</h2>
+        <p>الدخول مخصص للخدام المعتمدين فقط. استخدم البريد وكلمة المرور التي أنشأها مسؤول Firebase لك.</p>
+        <form id="auth-login-form">
+          <label for="auth-email">البريد الإلكتروني</label><input id="auth-email" type="email" autocomplete="username" required>
+          <label for="auth-password">كلمة المرور</label><input id="auth-password" type="password" autocomplete="current-password" required>
+          <button id="auth-login-btn" type="submit">تسجيل الدخول</button>
+        </form><div id="auth-message" aria-live="polite"></div>
+      </div>
+    </div>
+    <button id="auth-logout-btn" type="button">تسجيل الخروج</button>
+
+
+    <div class="header-bar">
+        <div class="header-title">
+            <i class="fa-solid fa-shield-halved" style="color: var(--accent-blue)"></i>
+            كشافة العذراء والأنبا أبرام
+        </div>
+        <div class="btn-status" id="cloud-status"><i class="fa-solid fa-circle" style="font-size:8px; color:#10b981;"></i> جاري الاتصال بالسحابة...</div>
+    </div>
+
+    <div class="container">
+        
+        <div id="page-home" class="page active">
+            <div class="cover-banner">
+                <h1>كشافة كنيسة السيدة العذراء والأنبا أبرام</h1>
+                <p>لوحة المتابعة وإدارة الكشافة الموحدة</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fa-regular fa-user stat-icon"></i>
+                    <div class="stat-title">إجمالي المخدومين</div>
+                    <div class="stat-value" id="stat-makhdomin-count">0</div>
+                    <div class="stat-sub">سجل الكشافة</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fa-regular fa-address-book stat-icon"></i>
+                    <div class="stat-title">إجمالي الخدام</div>
+                    <div class="stat-value" id="stat-khodam-count">0</div>
+                    <div class="stat-sub">فريق الخدمة</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fa-regular fa-calendar-check stat-icon"></i>
+                    <div class="stat-title">حضور الأسبوع الحالي</div>
+                    <div class="stat-value" id="stat-attendance-today">0</div>
+                    <div class="stat-sub">خلال الـ 7 أيام الأخيرة</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title" style="color:var(--danger)">بحاجة إلى إفتقاد</div>
+                    <div class="stat-value" id="stat-eftiqad-count">0</div>
+                    <div class="stat-sub">غائبون لأكثر من 7 أيام</div>
+                </div>
+            </div>
+
+            <div class="section-block">
+                <div class="section-title">
+                    <i class="fa-solid fa-cake-candles" style="color: #ec4899;"></i>
+                    أعياد ميلاد الشهر الحالي
+                </div>
+                <div class="form-group">
+                    <label class="form-label">تصفية بالمرحلة</label>
+                    <select class="form-select" id="birthday-filter-stage" onchange="window.renderBirthdays()">
+                        <option value="ALL">كل المراحل الكشفية</option>
+                        <option value="براعم">براعم</option>
+                        <option value="أشبال (أ)">أشبال (أ)</option>
+                        <option value="أشبال (ب)">أشبال (ب)</option>
+                        <option value="كشاف">كشاف</option>
+                        <option value="متقدم">متقدم</option>
+                        <option value="جوالة">جوالة</option>
+                    </select>
+                </div>
+                <div id="birthdays-list-container"></div>
+            </div>
+
+            <div class="section-block">
+                <div class="section-title">
+                    <i class="fa-solid fa-share-nodes" style="color: var(--accent-blue);"></i>
+                    منصاتنا
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div class="search-result-item">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <i class="fa-brands fa-facebook" style="color: #1877f2; font-size: 1.3rem;"></i>
+                            <strong>فيسبوك</strong>
+                        </div>
+                        <a href="https://www.facebook.com/share/19qm95uffo/" target="_blank" style="color: var(--accent-blue); text-decoration: none; font-weight: 700;">انقر هنا</a>
+                    </div>
+                    <div class="search-result-item">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <i class="fa-brands fa-instagram" style="color: #e4405f; font-size: 1.3rem;"></i>
+                            <strong>إنستغرام</strong>
+                        </div>
+                        <a href="https://www.instagram.com/the_scout.team?igsi=MW8wMmNjYngyd3hzdg==" target="_blank" style="color: var(--accent-blue); text-decoration: none; font-weight: 700;">انقر هنا</a>
+                    </div>
+                    <div class="search-result-item">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <i class="fa-brands fa-tiktok" style="color: #ffffff; font-size: 1.3rem;"></i>
+                            <strong>تيك توك</strong>
+                        </div>
+                        <a href="https://www.tiktok.com/%40the_scouts_team?_r=1&_t=ZS-92Dk4AzUQSt&fbclid=PAb21jcAT81ilwZG9mAmV4dG4DYWVtAjExAHNydGMGYXBwX2lkDzU2NzA2NzM0MzM1MjQyNwABp_S3DVlbmL9hL0vK1IjZo5dNsJehiUiWX0J9cm3s_3Y0eFaVonnwj7bL_kJc_aem_rjcNezADQdqWw87JwW0Cyg" target="_blank" style="color: var(--accent-blue); text-decoration: none; font-weight: 700;">انقر هنا</a>
+                    </div>
+                    <div class="search-result-item">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <i class="fa-brands fa-whatsapp" style="color: #25d366; font-size: 1.3rem;"></i>
+                            <strong>رقم التواصل مع القائد</strong>
+                        </div>
+                        <a href="https://wa.me/201271671271" target="_blank" style="color: var(--success); text-decoration: none; font-weight: 700; direction: ltr;">01271671271</a>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; padding: 20px 0 10px 0; color: var(--text-muted); font-size: 0.85rem; line-height: 1.6;">
+                <div style="font-weight: 700; color: var(--text-main); font-size: 0.95rem;">كشافة العذراء والانبا ابرام</div>
+                <div>© جميع الحقوق محفوظة</div>
+                <div style="font-size: 0.8rem; margin-top: 4px; color: var(--accent-blue);">قام باعداد الموقع الكشاف Mina.R.S</div>
+            </div>
+        </div>
+
+        <div id="page-makhdomin" class="page">
+            <div style="margin: 16px 0;">
+                <button class="btn btn-primary" onclick="window.openAddModal('makhdom')">
+                    <i class="fa-solid fa-plus"></i> إضافة مخدوم جديد
+                </button>
+            </div>
+
+            <div class="stats-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                <div class="stat-card" style="padding:8px; text-align:center;">
+                    <div class="stat-title">براعم</div>
+                    <div class="stat-value" id="count-stage-براعم">0</div>
+                </div>
+                <div class="stat-card" style="padding:8px; text-align:center;">
+                    <div class="stat-title">أشبال (أ)</div>
+                    <div class="stat-value" id="count-stage-أشبال (أ)">0</div>
+                </div>
+                <div class="stat-card" style="padding:8px; text-align:center;">
+                    <div class="stat-title">أشبال (ب)</div>
+                    <div class="stat-value" id="count-stage-أشبال (ب)">0</div>
+                </div>
+                <div class="stat-card" style="padding:8px; text-align:center;">
+                    <div class="stat-title">كشاف</div>
+                    <div class="stat-value" id="count-stage-كشاف">0</div>
+                </div>
+                <div class="stat-card" style="padding:8px; text-align:center;">
+                    <div class="stat-title">متقدم</div>
+                    <div class="stat-value" id="count-stage-متقدم">0</div>
+                </div>
+                <div class="stat-card" style="padding:8px; text-align:center;">
+                    <div class="stat-title">جوالة</div>
+                    <div class="stat-value" id="count-stage-جوالة">0</div>
+                </div>
+            </div>
+
+            <div class="section-block">
+                <div class="form-group">
+                    <input type="text" id="makhdom-search" class="form-control" placeholder="بحث بالاسم أو الكود..." oninput="window.debouncedRenderMakhdomin()">
+                </div>
+                <div class="form-group">
+                    <select class="form-select" id="makhdom-filter-stage" onchange="window.renderMakhdominTable()">
+                        <option value="ALL">كل المراحل الكشفية</option>
+                        <option value="براعم">براعم</option>
+                        <option value="أشبال (أ)">أشبال (أ)</option>
+                        <option value="أشبال (ب)">أشبال (ب)</option>
+                        <option value="كشاف">كشاف</option>
+                        <option value="متقدم">متقدم</option>
+                        <option value="جوالة">جوالة</option>
+                    </select>
+                </div>
+
+                <div style="overflow-x:auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>الكود</th>
+                                <th>الاسم</th>
+                                <th>المرحلة</th>
+                                <th>الهاتف</th>
+                                <th>حذف</th>
+                            </tr>
+                        </thead>
+                        <tbody id="makhdomin-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section-block" id="stage-export-section">
+                <div class="section-title"><i class="fa-solid fa-file-excel" style="color:var(--success)"></i> استخراج أسماء وأكواد مرحلة</div>
+                <p style="font-size:.82rem;color:var(--text-muted);line-height:1.7;margin-bottom:12px;">ينزّل ملف Excel بأسماء وأكواد المرحلة المختارة.</p>
+                <div class="form-group">
+                    <label class="form-label" for="data-export-stage">المرحلة المطلوب استخراجها</label>
+                    <select class="form-select" id="data-export-stage">
+                        <option value="براعم">براعم</option>
+                        <option value="أشبال (أ)">أشبال أ</option>
+                        <option value="أشبال (ب)">أشبال ب</option>
+                        <option value="كشاف">كشاف</option>
+                        <option value="متقدم">متقدم</option>
+                        <option value="جوالة">جوالة</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" id="export-stage-btn" onclick="window.exportStageMembers()"><i class="fa-solid fa-file-excel"></i> استخراج بيانات المرحلة</button>
+                <div id="stage-export-status" style="font-size:.82rem;color:var(--text-muted);margin-top:8px;" aria-live="polite"></div>
+            </div>
+
+            <div class="section-block" id="season-end-section">
+                <div class="section-title"><i class="fa-solid fa-arrow-right-arrow-left" style="color:#f59e0b"></i> نهاية الموسم — ترقية المراحل</div>
+                <p style="font-size:.82rem;color:var(--text-muted);line-height:1.7;margin-bottom:12px;">يراجع تاريخ ميلاد كل مخدوم ويضعه في مرحلته المناسبة، سواء بالترقية أو الرجوع لمرحلة أصغر.</p>
+                <button class="btn btn-primary" id="season-end-btn" style="background:#b45309;" onclick="window.runSeasonPromotion()"><i class="fa-solid fa-calendar-check"></i> نهاية الموسم</button>
+                <div id="season-end-status" style="font-size:.82rem;color:var(--text-muted);margin-top:10px;line-height:1.7;" aria-live="polite"></div>
+            </div>
+
+            <div class="section-block" id="backup-section">
+                <div class="section-title"><i class="fa-solid fa-shield-halved" style="color:var(--success)"></i> حماية البيانات والنسخ الاحتياطي</div>
+                <p style="font-size:.82rem;color:var(--text-muted);line-height:1.7;margin-bottom:12px;">تنزيل نسخة احتياطية من البيانات أو استعادة نسخة سابقة.</p>
+                <button class="btn btn-primary" id="backup-download-btn" onclick="window.downloadFullBackup()"><i class="fa-solid fa-download"></i> تنزيل نسخة احتياطية كاملة</button>
+                <button class="btn btn-call" id="backup-restore-btn" style="margin-top:8px;" onclick="document.getElementById('backup-restore-file').click()"><i class="fa-solid fa-clock-rotate-left"></i> استعادة من نسخة احتياطية</button>
+                <input type="file" id="backup-restore-file" accept=".json,application/json" style="display:none" onchange="window.restoreFullBackupFromFile(this)">
+                <div id="backup-status" style="font-size:.82rem;color:var(--text-muted);margin-top:10px;line-height:1.7;" aria-live="polite"></div>
+            </div>
+        </div>
+
+        <div id="page-khodam" class="page">
+            <div style="margin: 16px 0;">
+                <button class="btn btn-primary" style="background-color: #0284c7;" onclick="window.openAddModal('khadem')">
+                    <i class="fa-solid fa-user-plus"></i> إضافة خادم جديد
+                </button>
+            </div>
+
+            <div class="section-block">
+                <div class="section-title"><i class="fa-solid fa-users-gear"></i> سجل فريق الخدمة (الخدام)</div>
+                <div style="overflow-x:auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>اسم الخادم</th>
+                                <th>الهاتف</th>
+                                <th>المرحلة الكشفية</th>
+                                <th>حذف</th>
+                            </tr>
+                        </thead>
+                        <tbody id="khodam-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-attendance" class="page">
+            <div class="section-block" style="margin-top:16px;">
+                <div class="section-title"><i class="fa-solid fa-clipboard-user"></i> تسجيل الحضور بالاسم أو الكود</div>
+                <div class="form-group">
+                    <input type="text" id="attendance-search-input" class="form-control" placeholder="اكتب اسم المخدوم أو الكود الرقمي..." oninput="window.searchForAttendance()">
+                </div>
+                <div id="attendance-search-results"></div>
+            </div>
+
+            <div class="section-block">
+                <div class="section-title">تسجيلات حضور الأسبوع الحالي (7 أيام)</div>
+                <div id="today-attendance-log"></div>
+            </div>
+
+            <div class="section-block">
+                <div class="section-title"><i class="fa-solid fa-file-excel"></i> تقرير الحضور الأسبوعي أو الشهري</div>
+                <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:12px;line-height:1.8;">
+                    التقرير يحتوي على ملخص لكل مخدوم، وأعمدة لتواريخ الحضور المسجلة، وسجل تفصيلي للحضور والإفتقاد. الخانة الفارغة تعني عدم وجود تسجيل حضور في ذلك التاريخ، وليست حكمًا تلقائيًا بالغياب. التصفير يحذف سجلات الفترة المحددة فقط بعد التصدير والتأكيد، ولا يحذف بيانات الأشخاص الأساسية.
+                </p>
+                <div class="form-group">
+                    <label class="form-label" for="report-period-type">نوع التقرير</label>
+                    <select id="report-period-type" class="form-select" onchange="window.updateReportPeriodUI()">
+                        <option value="month">شهري</option>
+                        <option value="week">أسبوعي (7 أيام من تاريخ البداية)</option>
+                    </select>
+                </div>
+                <div class="form-group" id="report-month-group">
+                    <label class="form-label" for="report-month">الشهر المطلوب</label>
+                    <input type="month" id="report-month" class="form-control">
+                </div>
+                <div class="form-group" id="report-week-group" style="display:none;">
+                    <label class="form-label" for="report-week-start">أول يوم في الأسبوع المطلوب</label>
+                    <input type="date" id="report-week-start" class="form-control">
+                    <p style="font-size:.75rem;color:var(--text-muted);margin-top:4px;">سيشمل التقرير هذا التاريخ والستة أيام التالية.</p>
+                </div>
+                <button class="btn btn-primary" id="export-month-btn" onclick="window.exportMonthlyReport()"><i class="fa-solid fa-file-excel"></i> تصدير التقرير إلى Excel</button>
+                <button class="btn btn-danger" id="reset-month-btn" style="margin-top:10px;" onclick="window.resetMonthlyRecords()" disabled><i class="fa-solid fa-trash-can"></i> حذف سجلات الحضور والإفتقاد فقط</button>
+                <p id="monthly-report-status" style="font-size:.8rem;color:var(--text-muted);margin-top:10px;line-height:1.7;">لا يمكن حذف السجلات إلا بعد إنشاء التقرير من نفس الصفحة، ثم التأكيد بشكل منفصل.</p>
+            </div>
+        </div>
+
+        <div id="page-eftiqad" class="page">
+            <div class="section-block" style="margin-top:16px;">
+                <div class="section-title" style="color:var(--danger);">
+                    <i class="fa-solid fa-heart-crack"></i> الأشخاص بحاجة إلى إفتقاد (غائبون لأكثر من 7 أيام)
+                </div>
+                <div class="form-group">
+                    <label class="form-label">تصفية بالمرحلة</label>
+                    <select class="form-select" id="eftiqad-filter-stage" onchange="window.renderEftiqadList()">
+                        <option value="ALL">كل المراحل الكشفية</option>
+                        <option value="براعم">براعم</option>
+                        <option value="أشبال (أ)">أشبال (أ)</option>
+                        <option value="أشبال (ب)">أشبال (ب)</option>
+                        <option value="كشاف">كشاف</option>
+                        <option value="متقدم">متقدم</option>
+                        <option value="جوالة">جوالة</option>
+                    </select>
+                </div>
+                <div id="eftiqad-pending-container"></div>
+            </div>
+
+            <div class="section-block">
+                <div class="section-title" style="color:var(--success);">
+                    <i class="fa-solid fa-circle-check"></i> تم إفتقادهم مؤخراً
+                </div>
+                <div id="eftiqad-done-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="addModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">إضافة جديدة</h3>
+                <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="window.closeModal('addModal')"></i>
+            </div>
+            <form id="add-form" onsubmit="window.handleFormSubmit(event)">
+                <input type="hidden" id="form-type" value="makhdom">
+                
+                <div class="form-group">
+                    <label class="form-label" id="label-name">الاسم بالكامل</label>
+                    <input type="text" id="input-name" class="form-control" required placeholder="اكتب الاسم هنا">
+                </div>
+
+                <div class="form-group" id="group-stage">
+                    <label class="form-label" id="label-stage">المرحلة الكشفية</label>
+                    <select class="form-select" id="input-stage">
+                        <option value="براعم">براعم</option>
+                        <option value="أشبال (أ)">أشبال (أ)</option>
+                        <option value="أشبال (ب)">أشبال (ب)</option>
+                        <option value="كشاف">كشاف</option>
+                        <option value="متقدم">متقدم</option>
+                        <option value="جوالة">جوالة</option>
+                        <option value="كل المراحل" id="opt-all-stages" style="display:none;">كل المراحل</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="group-dob">
+                    <label class="form-label">تاريخ الميلاد</label>
+                    <input type="date" id="input-dob" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" id="label-phone">رقم الهاتف / ولي الأمر</label>
+                    <input type="tel" id="input-phone" class="form-control" placeholder="01xxxxxxxx">
+                </div>
+
+                <button type="submit" id="btn-submit-form" class="btn btn-primary" style="margin-top:16px;">حفظ البيانات</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="window.switchTab('home', this)">
+            <i class="fa-solid fa-house"></i>
+            <span>الرئيسية</span>
+        </div>
+        <div class="nav-item" onclick="window.switchTab('makhdomin', this)">
+            <i class="fa-solid fa-users"></i>
+            <span>المخدومون</span>
+        </div>
+        <div class="nav-item" onclick="window.switchTab('khodam', this)">
+            <i class="fa-solid fa-user-shield"></i>
+            <span>الخدام</span>
+        </div>
+        <div class="nav-item" onclick="window.switchTab('attendance', this)">
+            <i class="fa-solid fa-clipboard-check"></i>
+            <span>الحضور</span>
+        </div>
+        <div class="nav-item" onclick="window.switchTab('eftiqad', this)">
+            <i class="fa-solid fa-heart-pulse"></i>
+            <span>الإفتقاد</span>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const firebaseConfig = {
+              apiKey: "AIzaSyC_as9D16zvCFqKUIjizPcBx1VIqYqvqmc",
+              authDomain: "scout-app-ae.firebaseapp.com",
+              projectId: "scout-app-ae",
+              storageBucket: "scout-app-ae.firebasestorage.app",
+              messagingSenderId: "483335560223",
+              appId: "1:483335560223:web:b04d4d5486e3004812492a",
+              measurementId: "G-NMBYL5T0BZ"
+            };
+
+            if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+            const APPROVED_ADMIN_UIDS = [
+              'I8wafVzQwgd3oSh3UvigdwPFZlg1',
+              'XGzog5wSONd9WfdhrGIOlhnByJE3',
+              '9k6KkR1UHIelp25iNoZIEuSAHlq2',
+              'Ko2CTXR70VNwvHo7KKFNqaSFtnz2',
+              'I99HcGa8m9Tb4iFV5uBRXr9OCcK2',
+              '0yARLIkZFcYInLZc1XtTTunuqHv2',
+              'DisTKIoYXLXwoWSCwarDakWWskv1',
+              'PGmQKX6aFsWx0Q1DGS0lYnAxiTj1',
+              'qwgb3GNfOocoP7l1OR4X2kzQYx53',
+              '7cxdrsjGXCY7q8BOxcy3VKgJKfX2'
+            ];
+            
+            firebase.auth().onAuthStateChanged(user => {
+              if (user && APPROVED_ADMIN_UIDS.includes(user.uid)) startAdminApp();
+            });
+            
+            function startAdminApp() {
+            const db = firebase.firestore();
+
+            const COLLECTION_MAKHDOMIN = 'scout_makhdomin_v3';
+            const COLLECTION_PHONES = 'scout_phones_v3';
+            const COLLECTION_KHODAM = 'scout_khodam_v3';
+            const COLLECTION_ATTENDANCE = 'scout_attendance_v3';
+            const COLLECTION_EFTIQAD = 'scout_eftiqad_v1';
+            const COUNTER_DOC = 'scout_settings/makhdomin_counter';
+            const SETTINGS_COLLECTION = 'scout_settings';
+            const SEASON_PROMOTION_DOC = 'season_promotion';
+            
+            const SCHOOL_YEAR_START_MONTH = 8;
+            const PAGE_SIZE = 50;
+            const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+            const STAGES = ['براعم', 'أشبال (أ)', 'أشبال (ب)', 'كشاف', 'متقدم', 'جوالة'];
+
+            let localCache = {
+                makhdomin: [],
+                phones: new Map(),
+                khodam: [],
+                attendance: [],
+                attendanceByMakhdom: new Map(),
+                eftiqadByMakhdom: new Map(),
+                connection: { makhdomin: null, phones: null, khodam: null, attendance: null, eftiqad: null }
+            };
+
+            let searchTimeout = null;
+            let makhdomPage = 1;
+            let listenersStarted = false;
+            let renderQueued = false;
+            let exportedPeriodInThisSession = null;
+            let exportedRecordIds = { attendance: [], eftiqad: [] };
+            let exportedAtMs = 0;
+            let attendanceUnsubscribe = null;
+            let eftiqadUnsubscribe = null;
+            let markerMigrationRunning = false;
+            let midnightTimer = null;
+            let backupDownloadedAtMs = 0;
+
+            function localDateKey(date = new Date()) {
+                const y = date.getFullYear();
+                const m = String(date.getMonth() + 1).padStart(2, '0');
+                const d = String(date.getDate()).padStart(2, '0');
+                return `${y}-${m}-${d}`;
+            }
+
+            function shiftDateKey(days, from = new Date()) {
+                const d = new Date(from.getFullYear(), from.getMonth(), from.getDate());
+                d.setDate(d.getDate() + days);
+                return localDateKey(d);
+            }
+
+            function escapeHtml(value) {
+                return String(value ?? '')
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+
+            function normalizeStage(stage) {
+                const value = String(stage || '').trim().replace(/[أإآ]/g, 'ا').replace(/\s+/g, ' ');
+                const aliases = {
+                    'براعم': 'براعم',
+                    'اشبال ا': 'أشبال (أ)', 'اشبال (ا)': 'أشبال (أ)', 'اشبال أ': 'أشبال (أ)', 'أشبال أ': 'أشبال (أ)', 'أشبال (أ)': 'أشبال (أ)',
+                    'اشبال ب': 'أشبال (ب)', 'اشبال (ب)': 'أشبال (ب)', 'أشبال ب': 'أشبال (ب)', 'أشبال (ب)': 'أشبال (ب)',
+                    'كشاف': 'كشاف', 'متقدم': 'متقدم', 'جواله': 'جوالة', 'جوالة': 'جوالة'
+                };
+                return aliases[value] || value;
+            }
+
+            function getSchoolYearInfo(now = new Date()) {
+                const startYear = now.getMonth() >= SCHOOL_YEAR_START_MONTH ? now.getFullYear() : now.getFullYear() - 1;
+                return { startYear, key: `${startYear}-${startYear + 1}`, startDate: `${startYear}-09-01` };
+            }
+
+            function getAcademicAge(dob, schoolYearStartYear) {
+                if (typeof dob !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(dob)) return null;
+                const [year, month, day] = dob.split('-').map(Number);
+                const parsed = new Date(year, month - 1, day);
+                if (parsed.getFullYear() !== year || parsed.getMonth() !== month - 1 || parsed.getDate() !== day) return null;
+                const age = schoolYearStartYear - year;
+                return age >= 0 ? age : null;
+            }
+
+            function stageForAcademicAge(age) {
+                if (!Number.isFinite(age) || age < 5 || age > 25) return null;
+                if (age < 7) return 'براعم';
+                if (age < 9) return 'أشبال (أ)';
+                if (age < 11) return 'أشبال (ب)';
+                if (age < 14) return 'كشاف';
+                if (age < 17) return 'متقدم';
+                return 'جوالة';
+            }
+
+            function safeDateMs(value) {
+                if (typeof value === 'number') return value;
+                if (!value) return NaN;
+                if (value.toDate) return value.toDate().getTime();
+                const t = new Date(value).getTime();
+                return Number.isNaN(t) ? NaN : t;
+            }
+
+            function getLastAttendanceDate(makhdomId) {
+                const person = localCache.makhdomin.find(item => item.id === makhdomId);
+                return (person && typeof person.lastAttendanceDate === 'string' && person.lastAttendanceDate)
+                    || localCache.attendanceByMakhdom.get(makhdomId) || null;
+            }
+
+            function dateKeyDayNumber(key) {
+                if (!/^\d{4}-\d{2}-\d{2}$/.test(key || '')) return NaN;
+                const [y, m, d] = key.split('-').map(Number);
+                return Math.floor(Date.UTC(y, m - 1, d) / 86400000);
+            }
+
+            function addDaysToDateKey(key, days) {
+                const n = dateKeyDayNumber(key);
+                if (!Number.isFinite(n)) return null;
+                const d = new Date((n + days) * 86400000);
+                return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
+            }
+
+            function getAbsencePlan(person, mode, todayKey = localDateKey()) {
+                const hasAttendance = typeof person.lastAttendanceDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(person.lastAttendanceDate);
+                const createdMs = safeDateMs(person.createdAt);
+                const anchor = hasAttendance ? person.lastAttendanceDate
+                    : (person.absenceAnchorDate || (Number.isFinite(createdMs) ? localDateKey(new Date(createdMs)) : todayKey));
+                const elapsed = Math.max(0, dateKeyDayNumber(todayKey) - dateKeyDayNumber(anchor));
+                let due;
+                if (hasAttendance) due = Math.floor(elapsed / 7);
+                else if (mode === 'attendance') due = elapsed >= 7 ? Math.floor(elapsed / 7) + 1 : 0;
+                else due = Math.floor(elapsed / 7) + 1;
+                const counted = Math.max(0, Number(person.absencePeriodsCounted) || 0);
+                const start = Math.min(counted, due);
+                const periods = [];
+                for (let period = start; period < due; period++) {
+                    const offset = hasAttendance ? period + 1 : period;
+                    const date = addDaysToDateKey(anchor, offset * 7);
+                    if (date) periods.push({ period, date, anchor });
+                }
+                return { anchor, due, periods };
+            }
+
+            function addAbsenceRecordsToTransaction(transaction, makhdomId, plan) {
+                for (const item of plan.periods) {
+                    const logRef = db.collection(COLLECTION_EFTIQAD).doc(`${makhdomId}__absence__${item.date}`);
+                    const [year, month, day] = item.date.split('-').map(Number);
+                    const timestamp = new Date(year, month - 1, day, 0, 0, 0, 0).getTime();
+                    transaction.set(logRef, {
+                        makhdomId,
+                        recordType: 'absence',
+                        type: 'غياب',
+                        date: item.date,
+                        dateStr: item.date,
+                        timestamp,
+                        absencePeriod: item.period + 1,
+                        anchorDate: item.anchor,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                }
+            }
+
+            function getMissedWeeks(person) {
+                const plan = getAbsencePlan(person, 'list', localDateKey());
+                return plan.due;
+            }
+
+            function hasPendingAbsence(person, todayKey = localDateKey()) {
+                return getAbsencePlan(person, 'list', todayKey).periods.length > 0;
+            }
+
+            function isAttendedInLast7Days(makhdomId) {
+                const lastDate = getLastAttendanceDate(makhdomId);
+                if (!lastDate) return false;
+                const cutoff = shiftDateKey(-6);
+                return lastDate >= cutoff && lastDate <= localDateKey();
+            }
+
+            function rebuildAttendanceIndex() {
+                const map = new Map();
+                for (const a of localCache.attendance) {
+                    if (!a.makhdomId || !a.date) continue;
+                    const current = map.get(a.makhdomId);
+                    if (!current || a.date > current) map.set(a.makhdomId, a.date);
+                }
+                localCache.attendanceByMakhdom = map;
+            }
+
+            function queueRender(parts = []) {
+                if (renderQueued) return;
+                renderQueued = true;
+                requestAnimationFrame(() => {
+                    renderQueued = false;
+                    renderParts(parts);
+                });
+            }
+
+            function renderParts(parts) {
+                const set = new Set(parts);
+                if (!parts.length || set.has('stats')) renderStats();
+                if (!parts.length || set.has('makhdomin')) renderMakhdominTable();
+                if (!parts.length || set.has('khodam')) renderKhodamTable();
+                if (!parts.length || set.has('birthdays')) renderBirthdays();
+                if (!parts.length || set.has('attendance')) {
+                    renderTodayAttendance();
+                    searchForAttendance();
+                }
+                if (!parts.length || set.has('eftiqad')) renderEftiqadList();
+            }
+
+            function setConnectionState(type, connected) {
+                localCache.connection[type] = connected;
+                const el = document.getElementById('cloud-status');
+                if (!el) return;
+                const states = Object.values(localCache.connection);
+                const allOk = states.every(value => value === true);
+                const hasFailure = states.some(value => value === false);
+                el.textContent = allOk ? 'متصل بالسحابة' : (hasFailure ? 'تعذر الاتصال بالسحابة' : 'جاري الاتصال بالسحابة...');
+                el.style.opacity = allOk ? '1' : '0.85';
+            }
+
+            function monthRange(monthValue) {
+                if (!/^\d{4}-\d{2}$/.test(monthValue || '')) throw new Error('اختار الشهر المطلوب أولاً.');
+                const [year, month] = monthValue.split('-').map(Number);
+                const start = `${year}-${String(month).padStart(2, '0')}-01`;
+                const endDate = new Date(year, month, 0);
+                const end = localDateKey(endDate);
+                return { start, end, startMs: new Date(year, month - 1, 1).getTime(), endExclusiveMs: new Date(year, month, 1).getTime(), key: `month:${monthValue}`, label: monthValue };
+            }
+
+            function weekRange(startValue) {
+                if (!/^\d{4}-\d{2}-\d{2}$/.test(startValue || '')) throw new Error('اختار أول يوم في الأسبوع المطلوب.');
+                const [year, month, day] = startValue.split('-').map(Number);
+                const startDate = new Date(year, month - 1, day);
+                if (localDateKey(startDate) !== startValue) throw new Error('تاريخ بداية الأسبوع غير صحيح.');
+                const endDate = new Date(year, month - 1, day);
+                endDate.setDate(endDate.getDate() + 6);
+                const endExclusiveDate = new Date(year, month - 1, day);
+                endExclusiveDate.setDate(endExclusiveDate.getDate() + 7);
+                return { start: startValue, end: localDateKey(endDate), startMs: startDate.getTime(), endExclusiveMs: endExclusiveDate.getTime(), key: `week:${startValue}`, label: `${startValue} إلى ${localDateKey(endDate)}` };
+            }
+
+            function selectedReportRange() {
+                const type = document.getElementById('report-period-type')?.value || 'month';
+                return type === 'week' ? weekRange(document.getElementById('report-week-start')?.value || '') : monthRange(selectedReportMonth());
+            }
+
+            function selectedReportMonth() {
+                const el = document.getElementById('report-month');
+                return el ? el.value : '';
+            }
+
+            function setMonthlyReportStatus(message, canReset = false) {
+                const status = document.getElementById('monthly-report-status');
+                const resetBtn = document.getElementById('reset-month-btn');
+                if (status) status.textContent = message;
+                if (resetBtn) resetBtn.disabled = !canReset;
+            }
+
+            window.updateReportPeriodUI = function() {
+                const type = document.getElementById('report-period-type')?.value || 'month';
+                const monthGroup = document.getElementById('report-month-group');
+                const weekGroup = document.getElementById('report-week-group');
+                if (monthGroup) monthGroup.style.display = type === 'month' ? 'block' : 'none';
+                if (weekGroup) weekGroup.style.display = type === 'week' ? 'block' : 'none';
+                let key = null;
+                try { key = selectedReportRange().key; } catch (_) {}
+                if (key !== exportedPeriodInThisSession) setMonthlyReportStatus('اختار الفترة ثم صدّر تقريرها قبل حذف أي سجلات.', false);
+                else if (key) setMonthlyReportStatus('تم تصدير هذه الفترة في الجلسة الحالية. تأكد من سلامة ملف Excel قبل الحذف.', true);
+            };
+
+            window.exportMonthlyReport = async function() {
+                let range;
+                try { range = selectedReportRange(); } catch (err) { alert(err.message); return; }
+                if (typeof XLSX === 'undefined') {
+                    alert('مكتبة إنشاء Excel لم يتم تحميلها.');
+                    return;
+                }
+                const btn = document.getElementById('export-month-btn');
+                if (btn) { btn.disabled = true; btn.innerText = 'جاري تجهيز التقرير...'; }
+                setMonthlyReportStatus('جاري قراءة بيانات الفترة وتجهيز ملف Excel...', false);
+                try {
+                    const [peopleSnap, phonesSnap, attendanceSnap, eftiqadSnap] = await Promise.all([
+                        db.collection(COLLECTION_MAKHDOMIN).get(),
+                        db.collection(COLLECTION_PHONES).get(),
+                        db.collection(COLLECTION_ATTENDANCE).where('date', '>=', range.start).where('date', '<=', range.end).get(),
+                        db.collection(COLLECTION_EFTIQAD).where('timestamp', '>=', range.startMs).where('timestamp', '<', range.endExclusiveMs).get()
+                    ]);
+                    const phonesMap = new Map(phonesSnap.docs.map(d => [d.id, d.data().phone]));
+                    const people = peopleSnap.docs.map(doc => ({ id: doc.id, phone: phonesMap.get(doc.id) || '', ...doc.data() }))
+                        .sort((a, b) => (parseInt(a.code) || 0) - (parseInt(b.code) || 0));
+                    const attendance = attendanceSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+                        .filter(a => a.date && a.makhdomId);
+                    const eftiqad = eftiqadSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    const peopleById = new Map(people.map(person => [person.id, person]));
+                    const attendanceKeys = new Set(attendance.map(a => `${a.makhdomId}|${a.date}`));
+                    const dates = [...new Set(attendance.map(a => a.date))].sort();
+                    const attendanceCountByPerson = new Map();
+                    attendance.forEach(a => attendanceCountByPerson.set(a.makhdomId, (attendanceCountByPerson.get(a.makhdomId) || 0) + 1));
+
+                    const summaryRows = people.map(person => {
+                        const row = {
+                            'كود المخدوم': person.code || '',
+                            'اسم المخدوم': person.name || '',
+                            'المرحلة': person.stage || '',
+                            'الهاتف': person.phone || '',
+                            'عدد مرات الحضور المسجلة': attendanceCountByPerson.get(person.id) || 0
+                        };
+                        dates.forEach(date => { row[date] = attendanceKeys.has(`${person.id}|${date}`) ? 'حاضر' : ''; });
+                        return row;
+                    });
+                    const detailRows = attendance.map(a => {
+                        const person = peopleById.get(a.makhdomId);
+                        return {
+                            'التاريخ': a.date || '',
+                            'الوقت': a.time || '',
+                            'كود المخدوم': person?.code || '',
+                            'اسم المخدوم': person?.name || 'مخدوم غير موجود حالياً',
+                            'المرحلة': person?.stage || ''
+                        };
+                    }).sort((a, b) => String(a['التاريخ']).localeCompare(String(b['التاريخ'])) || String(a['الوقت']).localeCompare(String(b['الوقت'])));
+
+                    const statsRows = [
+                        { 'البند': 'نوع الفترة', 'القيمة': range.key.startsWith('week:') ? 'أسبوعي' : 'شهري' },
+                        { 'البند': 'الفترة', 'القيمة': range.label },
+                        { 'البند': 'عدد المخدومين الحاليين', 'القيمة': people.length },
+                        { 'البند': 'إجمالي تسجيلات الحضور', 'القيمة': attendance.length },
+                        { 'البند': 'إجمالي إجراءات الإفتقاد المسجلة', 'القيمة': eftiqad.length }
+                    ];
+
+                    const eftiqadRows = eftiqad.map(log => {
+                        const person = peopleById.get(log.makhdomId);
+                        const timestamp = Number(log.timestamp);
+                        const date = new Date(timestamp || 0);
+                        return {
+                            'اسم المخدوم': person?.name || 'مخدوم غير موجود حالياً',
+                            'الكود': person?.code || '',
+                            'المرحلة': person?.stage || '',
+                            'طريقة الإفتقاد': log.type || '',
+                            'التاريخ والوقت': Number.isFinite(date.getTime()) && timestamp ? date.toLocaleString('ar-EG') : (log.dateStr || '')
+                        };
+                    });
+
+                    const workbook = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(summaryRows), 'ملخص الحضور');
+                    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(detailRows.length ? detailRows : [{ 'ملاحظة': 'لا توجد تسجيلات حضور في الفترة المحددة' }]), 'سجل الحضور');
+                    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(statsRows), 'الإحصائيات');
+                    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(eftiqadRows.length ? eftiqadRows : [{ 'ملاحظة': 'لا توجد سجلات افتقاد في الفترة المحددة' }]), 'سجل الإفتقاد');
+                    const filenamePeriod = range.key.startsWith('week:') ? range.start.replace(/-/g, '') : range.label;
+                    XLSX.writeFile(workbook, `تقرير_الحضور_${filenamePeriod}.xlsx`);
+                    exportedPeriodInThisSession = range.key;
+                    exportedRecordIds = { attendance: attendance.map(a => a.id), eftiqad: eftiqad.map(log => log.id) };
+                    exportedAtMs = Date.now();
+                    setMonthlyReportStatus(`تم إنشاء تقرير الفترة ${range.label}.`, true);
+                } catch (err) {
+                    console.error('Report export error:', err);
+                    setMonthlyReportStatus('فشل إنشاء التقرير.', false);
+                    alert('تعذر تصدير التقرير: ' + (err.message || err));
+                } finally {
+                    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-file-excel"></i> تصدير التقرير إلى Excel'; }
+                }
+            };
+
+            window.resetMonthlyRecords = async function() {
+                let range;
+                try { range = selectedReportRange(); } catch (err) { alert(err.message); return; }
+                if (range.key !== exportedPeriodInThisSession) {
+                    alert('صدّر تقرير الفترة المحددة أولاً.');
+                    return;
+                }
+                const confirmed = confirm(`تأكيد نهائي: سيتم حذف سجلات الحضور والإفتقاد المسجلة خلال ${range.label} فقط.`);
+                if (!confirmed) return;
+                const btn = document.getElementById('reset-month-btn');
+                if (btn) { btn.disabled = true; btn.innerText = 'جاري حذف السجلات...'; }
+                try {
+                    const [attendanceSnap, eftiqadSnap] = await Promise.all([
+                        db.collection(COLLECTION_ATTENDANCE).where('date', '>=', range.start).where('date', '<=', range.end).get(),
+                        db.collection(COLLECTION_EFTIQAD).where('timestamp', '>=', range.startMs).where('timestamp', '<', range.endExclusiveMs).get()
+                    ]);
+                    const exportedAttendanceIds = new Set(exportedRecordIds.attendance);
+                    const exportedEftiqadIds = new Set(exportedRecordIds.eftiqad);
+                    const ops = [];
+                    attendanceSnap.docs.filter(doc => exportedAttendanceIds.has(doc.id)).forEach(doc => ops.push({ type: 'delete', ref: doc.ref }));
+                    eftiqadSnap.docs.filter(doc => exportedEftiqadIds.has(doc.id)).forEach(doc => ops.push({ type: 'delete', ref: doc.ref }));
+                    
+                    const peopleSnap = await db.collection(COLLECTION_MAKHDOMIN).get();
+                    peopleSnap.docs.forEach(doc => {
+                        const data = doc.data();
+                        const updates = {};
+                        // Keep lastEftiqad on the member as durable workflow state even when monthly log documents are deleted.
+                        // The detailed action record is exported/deleted, but the person should not return to pending immediately.
+                        const last = data.lastEftiqad;
+                        const timestamp = last && Number(last.timestamp);
+                        if (Array.isArray(data.eftiqadLogs)) {
+                            const retained = data.eftiqadLogs.filter(log => {
+                                const ts = log && Number(log.timestamp);
+                                return !(ts && ts >= range.startMs && ts < range.endExclusiveMs && ts <= exportedAtMs);
+                            });
+                            if (retained.length !== data.eftiqadLogs.length) updates.eftiqadLogs = retained;
+                        }
+                        if (Object.keys(updates).length) ops.push({ type: 'update', ref: doc.ref, data: updates });
+                    });
+                    for (let i = 0; i < ops.length; i += 400) {
+                        const batch = db.batch();
+                        ops.slice(i, i + 400).forEach(op => op.type === 'delete' ? batch.delete(op.ref) : batch.update(op.ref, op.data));
+                        await batch.commit();
+                    }
+                    localCache.attendance = localCache.attendance.filter(a => !(a.date >= range.start && a.date <= range.end));
+                    rebuildAttendanceIndex();
+                    queueRender(['stats', 'attendance', 'eftiqad']);
+                    exportedPeriodInThisSession = null;
+                    exportedRecordIds = { attendance: [], eftiqad: [] };
+                    exportedAtMs = 0;
+                    setMonthlyReportStatus(`تم حذف سجلات فترة ${range.label} بنجاح.`, false);
+                    alert('تم حذف سجلات الفترة المحددة.');
+                } catch (err) {
+                    console.error('Period reset error:', err);
+                    setMonthlyReportStatus('لم يكتمل الحذف.', false);
+                    alert('حدث خطأ أثناء حذف السجلات: ' + (err.message || err));
+                } finally {
+                    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-trash-can"></i> حذف سجلات الحضور والإفتقاد فقط'; }
+                }
+            };
+
+            window.exportStageMembers = function() {
+                const btn = document.getElementById('export-stage-btn');
+                const status = document.getElementById('stage-export-status');
+                const selectedStage = document.getElementById('data-export-stage')?.value;
+                if (!selectedStage || !STAGES.includes(selectedStage)) {
+                    alert('اختار مرحلة صحيحة أولاً.');
+                    return;
+                }
+                if (typeof XLSX === 'undefined') {
+                    alert('مكتبة Excel لم يتم تحميلها.');
+                    return;
+                }
+                if (btn) { btn.disabled = true; btn.innerText = 'جاري تجهيز الملف...'; }
+                try {
+                    const people = localCache.makhdomin
+                        .filter(person => normalizeStage(person.stage) === selectedStage)
+                        .map(person => ({ 'الاسم': String(person.name || ''), 'الكود': person.code ?? '' }))
+                        .sort((a, b) => String(a['الاسم']).localeCompare(String(b['الاسم']), 'ar'));
+                    if (!people.length) {
+                        if (status) status.textContent = `لا توجد أسماء مسجلة في مرحلة ${selectedStage}.`;
+                        alert(`لا توجد أسماء مسجلة في مرحلة ${selectedStage}.`);
+                        return;
+                    }
+                    const workbook = XLSX.utils.book_new();
+                    const sheet = XLSX.utils.json_to_sheet(people, { header: ['الاسم', 'الكود'] });
+                    sheet['!cols'] = [{ wch: 32 }, { wch: 14 }];
+                    XLSX.utils.book_append_sheet(workbook, sheet, 'الأسماء والأكواد');
+                    const safeStage = selectedStage.replace(/[\\/:*?"<>|]/g, '-').replace(/[()]/g, '').replace(/\s+/g, '_');
+                    XLSX.writeFile(workbook, `أسماء_وأكواد_${safeStage}.xlsx`);
+                    if (status) status.textContent = `تم تجهيز ملف ${selectedStage}.`;
+                } catch (err) {
+                    console.error('Stage export error:', err);
+                    if (status) status.textContent = 'فشل استخراج البيانات.';
+                    alert('تعذر استخراج بيانات المرحلة: ' + (err.message || err));
+                } finally {
+                    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-file-excel"></i> استخراج بيانات المرحلة'; }
+                }
+            };
+
+            function buildPromotionPlan(people, schoolYearStartYear) {
+                const plans = [];
+                const skipped = { missingDob: 0, underAge: 0, unknownStage: 0 };
+                for (const person of people) {
+                    const age = getAcademicAge(person.dob, schoolYearStartYear);
+                    if (age === null) { skipped.missingDob++; continue; }
+                    const targetStage = stageForAcademicAge(age);
+                    if (!targetStage) { skipped.underAge++; continue; }
+                    const currentStage = normalizeStage(person.stage);
+                    if (!STAGES.includes(currentStage)) skipped.unknownStage++;
+                    if (currentStage !== targetStage || person.stage !== targetStage) {
+                        plans.push({ id: person.id, name: person.name || '', code: person.code ?? '', dob: person.dob || '', fromStage: person.stage || '', toStage: targetStage, age });
+                    }
+                }
+                const stageOrder = new Map(STAGES.map((stage, index) => [stage, index]));
+                plans.sort((a, b) => {
+                    const ai = stageOrder.has(normalizeStage(a.fromStage)) ? stageOrder.get(normalizeStage(a.fromStage)) : STAGES.length;
+                    const bi = stageOrder.has(normalizeStage(b.fromStage)) ? stageOrder.get(normalizeStage(b.fromStage)) : STAGES.length;
+                    return ai - bi || String(a.name).localeCompare(String(b.name), 'ar');
+                });
+                return { plans, skipped };
+            }
+
+            window.runSeasonPromotion = async function() {
+                const btn = document.getElementById('season-end-btn');
+                const status = document.getElementById('season-end-status');
+                if (btn?.disabled) return;
+                if (!firebase.auth().currentUser) { alert('يجب تسجيل الدخول.'); return; }
+                if (!backupDownloadedAtMs || Date.now() - backupDownloadedAtMs > 24 * 60 * 60 * 1000) {
+                    alert('لحماية البيانات، نزّل نسخة احتياطية كاملة قبل تشغيل نهاية الموسم.');
+                    return;
+                }
+                if (!confirm('سيتم حساب المرحلة المناسبة لكل مخدوم. هل تريد المتابعة؟')) return;
+                if (btn) { btn.disabled = true; btn.innerText = 'جاري مراجعة البيانات...'; }
+                let runId = `${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+                const jobRef = db.collection(SETTINGS_COLLECTION).doc(SEASON_PROMOTION_DOC);
+                try {
+                    const schoolYear = getSchoolYearInfo();
+                    const peopleSnap = await db.collection(COLLECTION_MAKHDOMIN).get();
+                    const people = peopleSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    const { plans, skipped } = buildPromotionPlan(people, schoolYear.startYear);
+                    if (!confirm(`السنة الدراسية ${schoolYear.key}\nعدد المخدومين: ${people.length}\nعدد من ستتغير مرحلتهم: ${plans.length}\n\nتأكيد بدء النقل؟`)) return;
+
+                    let processed = 0;
+                    let changed = 0;
+                    for (let i = 0; i < plans.length; i += 30) {
+                        const chunk = plans.slice(i, i + 30);
+                        const batch = db.batch();
+                        chunk.forEach(person => {
+                            batch.update(db.collection(COLLECTION_MAKHDOMIN).doc(person.id), {
+                                stage: person.toStage,
+                                lastSeasonPromotion: {
+                                    seasonKey: schoolYear.key,
+                                    fromStage: person.fromStage,
+                                    toStage: person.toStage,
+                                    academicAge: person.age,
+                                    changedAt: firebase.firestore.FieldValue.serverTimestamp()
+                                }
+                            });
+                        });
+                        await batch.commit();
+                        processed += chunk.length;
+                        changed += chunk.length;
+                    }
+                    if (status) status.textContent = `اكتملت نهاية الموسم. تغيّرت مرحلة ${changed} مخدومًا.`;
+                    alert(`اكتملت نهاية الموسم وتعديل مرحلة ${changed} مخدومًا.`);
+                } catch (err) {
+                    console.error('Season promotion error:', err);
+                    alert('توقفت عملية نهاية الموسم: ' + (err.message || err));
+                } finally {
+                    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-calendar-check"></i> نهاية الموسم'; }
+                    queueRender(['stats', 'makhdomin', 'birthdays', 'eftiqad']);
+                }
+            };
+
+            function encodeBackupValue(value) {
+                if (value && typeof value.toDate === 'function' && typeof value.toMillis === 'function') {
+                    return { __scoutBackupType: 'timestamp', value: value.toDate().toISOString() };
+                }
+                if (value instanceof Date) return { __scoutBackupType: 'timestamp', value: value.toISOString() };
+                if (Array.isArray(value)) return value.map(encodeBackupValue);
+                if (value && typeof value === 'object') {
+                    const result = {};
+                    Object.keys(value).forEach(key => { if (value[key] !== undefined) result[key] = encodeBackupValue(value[key]); });
+                    return result;
+                }
+                return value;
+            }
+
+            function decodeBackupValue(value) {
+                if (Array.isArray(value)) return value.map(decodeBackupValue);
+                if (value && typeof value === 'object') {
+                    if (value.__scoutBackupType === 'timestamp' && typeof value.value === 'string') {
+                        const date = new Date(value.value);
+                        if (!Number.isFinite(date.getTime())) throw new Error('تاريخ غير صالح.');
+                        return firebase.firestore.Timestamp.fromDate(date);
+                    }
+                    const result = {};
+                    Object.keys(value).forEach(key => { result[key] = decodeBackupValue(value[key]); });
+                    return result;
+                }
+                return value;
+            }
+
+            async function readCollectionForBackup(collectionName) {
+                const snap = await db.collection(collectionName).get();
+                return snap.docs.map(doc => ({ id: doc.id, data: encodeBackupValue(doc.data()) }));
+            }
+
+            window.downloadFullBackup = async function() {
+                const btn = document.getElementById('backup-download-btn');
+                const status = document.getElementById('backup-status');
+                if (btn?.disabled) return;
+                if (btn) { btn.disabled = true; btn.innerText = 'جاري تجهيز النسخة...'; }
+                try {
+                    const names = [COLLECTION_MAKHDOMIN, COLLECTION_PHONES, COLLECTION_KHODAM, COLLECTION_ATTENDANCE, COLLECTION_EFTIQAD];
+                    const collections = await Promise.all(names.map(async name => [name, await readCollectionForBackup(name)]));
+                    const settings = await readCollectionForBackup(SETTINGS_COLLECTION);
+                    const payload = {
+                        format: 'scout-app-full-backup', version: 1, projectId: firebase.app().options.projectId,
+                        exportedAt: new Date().toISOString(), collections: Object.fromEntries(collections), settings
+                    };
+                    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `نسخة_احتياطية_كشافة_${localDateKey()}.json`;
+                    document.body.appendChild(a); a.click(); a.remove();
+                    setTimeout(() => URL.revokeObjectURL(url), 1000);
+                    backupDownloadedAtMs = Date.now();
+                    if (status) status.textContent = 'تم تنزيل النسخة الاحتياطية بنجاح.';
+                } catch (err) {
+                    console.error('Backup export error:', err);
+                    alert('تعذر إنشاء النسخة الاحتياطية: ' + (err.message || err));
+                } finally {
+                    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-download"></i> تنزيل نسخة احتياطية كاملة'; }
+                }
+            };
+
+            window.restoreFullBackupFromFile = async function(input) {
+                const file = input?.files?.[0];
+                const btn = document.getElementById('backup-restore-btn');
+                const status = document.getElementById('backup-status');
+                if (!file) return;
+                input.value = '';
+                try {
+                    const payload = JSON.parse(await file.text());
+                    if (!payload || payload.format !== 'scout-app-full-backup') throw new Error('الملف ليس نسخة احتياطية صحيحة.');
+                    const expected = [COLLECTION_MAKHDOMIN, COLLECTION_PHONES, COLLECTION_KHODAM, COLLECTION_ATTENDANCE, COLLECTION_EFTIQAD];
+                    if (!confirm('هل تريد استعادة النسخة الاحتياطية؟')) return;
+                    const entries = [];
+                    expected.forEach(name => { if (payload.collections[name]) payload.collections[name].forEach(item => entries.push({ collection: name, item })); });
+                    payload.settings.forEach(item => entries.push({ collection: SETTINGS_COLLECTION, item }));
+                    for (let i = 0; i < entries.length; i += 250) {
+                        const batch = db.batch();
+                        entries.slice(i, i + 250).forEach(entry => {
+                            batch.set(db.collection(entry.collection).doc(entry.item.id), decodeBackupValue(entry.item.data));
+                        });
+                        await batch.commit();
+                    }
+                    if (status) status.textContent = 'اكتملت الاستعادة بنجاح.';
+                    alert('اكتملت الاستعادة بنجاح.');
+                } catch (err) {
+                    console.error('Backup restore error:', err);
+                    alert('تعذر إكمال الاستعادة: ' + (err.message || err));
+                } finally {
+                    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-clock-rotate-left"></i> استعادة من نسخة احتياطية'; }
+                }
+            };
+
+            function startAttendanceListener() {
+                if (attendanceUnsubscribe) attendanceUnsubscribe();
+                const cutoffDate = shiftDateKey(-6);
+                attendanceUnsubscribe = db.collection(COLLECTION_ATTENDANCE)
+                    .where('date', '>=', cutoffDate)
+                    .where('date', '<=', localDateKey())
+                    .onSnapshot(snapshot => {
+                        localCache.attendance = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        rebuildAttendanceIndex();
+                        setConnectionState('attendance', true);
+                        queueRender(['stats', 'attendance', 'eftiqad']);
+                    }, err => {
+                        setConnectionState('attendance', false);
+                        console.error('Attendance Sync Error:', err);
+                    });
+            }
+
+            function startEftiqadListener() {
+                if (eftiqadUnsubscribe) eftiqadUnsubscribe();
+                eftiqadUnsubscribe = db.collection(COLLECTION_EFTIQAD)
+                    .where('timestamp', '>=', Date.now() - SEVEN_DAYS_MS)
+                    .onSnapshot(snapshot => {
+                        const map = new Map();
+                        snapshot.docs.forEach(doc => {
+                            const data = doc.data();
+                            if (data.recordType !== 'action' || !data.makhdomId) return;
+                            const current = map.get(data.makhdomId);
+                            if (!current || (data.timestamp || 0) > (current.timestamp || 0)) {
+                                map.set(data.makhdomId, { id: doc.id, ...data });
+                            }
+                        });
+                        localCache.eftiqadByMakhdom = map;
+                        setConnectionState('eftiqad', true);
+                        queueRender(['eftiqad']);
+                    }, err => {
+                        setConnectionState('eftiqad', false);
+                        console.error('Eftiqad Sync Error:', err);
+                    });
+            }
+
+            function initRealtimeSync() {
+                if (listenersStarted) return;
+                listenersStarted = true;
+
+                db.collection(COLLECTION_MAKHDOMIN).onSnapshot(snapshot => {
+                    localCache.makhdomin = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    localCache.makhdomin.sort((a, b) => (parseInt(a.code) || 0) - (parseInt(b.code) || 0));
+                    setConnectionState('makhdomin', true);
+                    queueRender(['stats', 'makhdomin', 'birthdays', 'eftiqad']);
+                }, err => {
+                    setConnectionState('makhdomin', false);
+                });
+
+                db.collection(COLLECTION_PHONES).onSnapshot(snapshot => {
+                    const map = new Map();
+                    snapshot.docs.forEach(doc => map.set(doc.id, doc.data().phone));
+                    localCache.phones = map;
+                    setConnectionState('phones', true);
+                    queueRender(['makhdomin', 'eftiqad']);
+                }, err => {
+                    setConnectionState('phones', false);
+                });
+
+                db.collection(COLLECTION_KHODAM).onSnapshot(snapshot => {
+                    localCache.khodam = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    setConnectionState('khodam', true);
+                    queueRender(['stats', 'khodam']);
+                }, err => {
+                    setConnectionState('khodam', false);
+                });
+
+                startAttendanceListener();
+                startEftiqadListener();
+            }
+
+            window.switchTab = function(tabId, el) {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                const targetPage = document.getElementById(`page-${tabId}`);
+                if (targetPage) targetPage.classList.add('active');
+                if (el) el.classList.add('active');
+                renderParts([]);
+            };
+
+            window.openAddModal = function(type) {
+                document.getElementById('form-type').value = type;
+                const dobGroup = document.getElementById('group-dob');
+                const dobInput = document.getElementById('input-dob');
+                const optAll = document.getElementById('opt-all-stages');
+                if (type === 'makhdom') {
+                    document.getElementById('modal-title').innerText = 'إضافة مخدوم جديد';
+                    document.getElementById('label-name').innerText = 'اسم المخدوم بالكامل';
+                    document.getElementById('label-stage').innerText = 'المرحلة الكشفية';
+                    document.getElementById('label-phone').innerText = 'رقم الهاتف / ولي الأمر';
+                    dobGroup.style.display = 'block';
+                    dobInput.required = true;
+                    optAll.style.display = 'none';
+                } else {
+                    document.getElementById('modal-title').innerText = 'إضافة خادم جديد';
+                    document.getElementById('label-name').innerText = 'اسم الخادم بالكامل';
+                    document.getElementById('label-stage').innerText = 'المرحلة التي يخدم بها';
+                    document.getElementById('label-phone').innerText = 'رقم هاتف الخادم';
+                    dobGroup.style.display = 'none';
+                    dobInput.required = false;
+                    optAll.style.display = 'block';
+                }
+                document.getElementById('addModal').classList.add('active');
+            };
+
+            window.closeModal = function(id) {
+                const modal = document.getElementById(id);
+                if (modal) modal.classList.remove('active');
+            };
+
+            window.handleFormSubmit = function(e) {
+                e.preventDefault();
+                const btnSubmit = document.getElementById('btn-submit-form');
+                if (btnSubmit.disabled) return;
+                btnSubmit.disabled = true;
+                btnSubmit.innerText = 'جاري الحفظ...';
+
+                const type = document.getElementById('form-type').value;
+                const name = document.getElementById('input-name').value.trim();
+                const stage = document.getElementById('input-stage').value;
+                const phone = document.getElementById('input-phone').value.trim();
+
+                if (type === 'makhdom') {
+                    const dob = document.getElementById('input-dob').value;
+                    const counterRef = db.doc(COUNTER_DOC);
+                    db.collection(COLLECTION_MAKHDOMIN).orderBy('code', 'desc').limit(1).get().then(maxSnap => {
+                        const highestExistingCode = maxSnap.empty ? 0 : (parseInt(maxSnap.docs[0].data().code, 10) || 0);
+                        return db.runTransaction(async transaction => {
+                            const counterDoc = await transaction.get(counterRef);
+                            const counterCode = counterDoc.exists ? (parseInt(counterDoc.data().lastCode, 10) || 0) : 0;
+                            const nextCode = Math.max(highestExistingCode, counterCode) + 1;
+                            const newMakhdomRef = db.collection(COLLECTION_MAKHDOMIN).doc();
+                            const makhdomId = newMakhdomRef.id;
+                            
+                            transaction.set(counterRef, { lastCode: nextCode }, { merge: true });
+                            transaction.set(newMakhdomRef, {
+                                code: nextCode, name, stage, dob,
+                                lastAttendanceDate: null,
+                                absenceAnchorDate: localDateKey(),
+                                absencePeriodsCounted: 0,
+                                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                            transaction.set(db.collection(COLLECTION_PHONES).doc(makhdomId), {
+                                phone,
+                                makhdomId
+                            });
+                            return nextCode;
+                        });
+                    }).then(assignedCode => {
+                        alert(`تمت الإضافة بنجاح! كود المخدوم هو: [ ${assignedCode} ]`);
+                        document.getElementById('add-form').reset();
+                        window.closeModal('addModal');
+                    }).catch(err => alert('حدث خطأ أثناء الحفظ: ' + err.message))
+                      .finally(() => {
+                          btnSubmit.disabled = false;
+                          btnSubmit.innerText = 'حفظ البيانات';
+                      });
+                } else {
+                    db.collection(COLLECTION_KHODAM).add({
+                        name, stage, phone,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }).then(() => {
+                        document.getElementById('add-form').reset();
+                        window.closeModal('addModal');
+                    }).catch(err => alert('حدث خطأ أثناء الحفظ: ' + err.message))
+                      .finally(() => {
+                          btnSubmit.disabled = false;
+                          btnSubmit.innerText = 'حفظ البيانات';
+                      });
+                }
+            };
+
+            window.deleteItem = async function(type, id) {
+                const message = type === 'makhdomin'
+                    ? 'سيتم حذف المخدوم وبيانات حضوره وسجلات افتقاده ورقم هاتفـه نهائياً. هل تريد المتابعة؟'
+                    : 'هل تريد حذف سجل الخادم نهائياً؟';
+                if (!confirm(message)) return;
+                try {
+                    if (type !== 'makhdomin') {
+                        await db.collection(COLLECTION_KHODAM).doc(id).delete();
+                        return;
+                    }
+                    const [attendanceSnap, eftiqadSnap] = await Promise.all([
+                        db.collection(COLLECTION_ATTENDANCE).where('makhdomId', '==', id).get(),
+                        db.collection(COLLECTION_EFTIQAD).where('makhdomId', '==', id).get()
+                    ]);
+                    const refs = [
+                        ...attendanceSnap.docs.map(doc => doc.ref),
+                        ...eftiqadSnap.docs.map(doc => doc.ref),
+                        db.collection(COLLECTION_MAKHDOMIN).doc(id),
+                        db.collection(COLLECTION_PHONES).doc(id)
+                    ];
+                    for (let i = 0; i < refs.length; i += 400) {
+                        const batch = db.batch();
+                        refs.slice(i, i + 400).forEach(ref => batch.delete(ref));
+                        await batch.commit();
+                    }
+                } catch (err) {
+                    console.error('Delete item error:', err);
+                    alert('خطأ في الحذف: ' + (err.message || err));
+                }
+            };
+
+            window.markAttendance = async function(makhdomId, buttonEl) {
+                const todayStr = localDateKey();
+                const attendanceRef = db.collection(COLLECTION_ATTENDANCE).doc(`${makhdomId}_${todayStr}`);
+                const personRef = db.collection(COLLECTION_MAKHDOMIN).doc(makhdomId);
+                if (buttonEl) {
+                    buttonEl.disabled = true;
+                    buttonEl.innerText = 'جاري التسجيل...';
+                }
+
+                try {
+                    await db.runTransaction(async transaction => {
+                        const [existing, personSnap] = await Promise.all([
+                            transaction.get(attendanceRef), transaction.get(personRef)
+                        ]);
+                        if (existing.exists) throw new Error('ALREADY_ATTENDED');
+                        if (!personSnap.exists) throw new Error('PERSON_NOT_FOUND');
+                        const person = { id: makhdomId, ...personSnap.data() };
+                        if (person.lastAttendanceDate === todayStr) throw new Error('ALREADY_ATTENDED');
+                        const plan = getAbsencePlan(person, 'attendance', todayStr);
+                        addAbsenceRecordsToTransaction(transaction, makhdomId, plan);
+                        transaction.set(attendanceRef, {
+                            makhdomId,
+                            date: todayStr,
+                            time: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }),
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                        transaction.update(personRef, {
+                            lastAttendanceDate: todayStr,
+                            absenceAnchorDate: todayStr,
+                            absencePeriodsCounted: 0
+                        });
+                    });
+
+                    const input = document.getElementById('attendance-search-input');
+                    const results = document.getElementById('attendance-search-results');
+                    if (input) input.value = '';
+                    if (results) results.innerHTML = '';
+                    queueRender(['stats', 'attendance', 'eftiqad']);
+                } catch (err) {
+                    if (err.message === 'ALREADY_ATTENDED') alert('تم تسجيل حضور هذا المخدوم اليوم بالفعل.');
+                    else if (err.message === 'PERSON_NOT_FOUND') alert('لم يتم العثور على بيانات المخدوم.');
+                    else alert('خطأ في تسجيل الحضور: ' + err.message);
+                } finally {
+                    if (buttonEl) {
+                        buttonEl.disabled = false;
+                        buttonEl.innerText = 'تسجيل حضور للأسبوع الحالي';
+                    }
+                }
+            };
+
+            window.searchForAttendance = function() {
+                const input = document.getElementById('attendance-search-input');
+                const container = document.getElementById('attendance-search-results');
+                if (!input || !container) return;
+                const query = input.value.trim().toLowerCase();
+                if (!query) { container.innerHTML = ''; return; }
+
+                const matches = localCache.makhdomin.filter(m =>
+                    (m.name && m.name.toLowerCase().includes(query)) || String(m.code) === query
+                ).slice(0, 20);
+
+                container.innerHTML = matches.map(m => {
+                    const attendedRecently = isAttendedInLast7Days(m.id);
+                    return `<div class="search-result-item">
+                        <div><strong>#${escapeHtml(m.code)} - ${escapeHtml(m.name)}</strong>
+                        <div style="font-size:0.8rem;color:var(--text-muted);">${escapeHtml(m.stage)}</div></div>
+                        ${attendedRecently
+                            ? '<span class="badge" style="background-color:var(--success);">حاضر هذا الأسبوع</span>'
+                            : `<button class="btn btn-primary btn-action" onclick="window.markAttendance('${escapeHtml(m.id)}', this)">تسجيل حضور للأسبوع الحالي</button>`}
+                    </div>`;
+                }).join('');
+            };
+
+            window.logEftiqadAction = async function(makhdomId, type) {
+                const m = localCache.makhdomin.find(item => item.id === makhdomId);
+                if (!m) return;
+                const now = new Date();
+                const todayKey = localDateKey(now);
+                const personRef = db.collection(COLLECTION_MAKHDOMIN).doc(makhdomId);
+                const actionLog = {
+                    makhdomId,
+                    recordType: 'action',
+                    type,
+                    date: todayKey,
+                    dateStr: now.toLocaleDateString('ar-EG') + ' - ' + now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }),
+                    timestamp: now.getTime()
+                };
+                try {
+                    await db.runTransaction(async transaction => {
+                        const personSnap = await transaction.get(personRef);
+                        if (!personSnap.exists) throw new Error('لم يتم العثور على بيانات المخدوم.');
+                        const person = { id: makhdomId, ...personSnap.data() };
+                        const plan = getAbsencePlan(person, 'action', todayKey);
+                        addAbsenceRecordsToTransaction(transaction, makhdomId, plan);
+                        transaction.update(personRef, {
+                            absenceAnchorDate: plan.anchor,
+                            absencePeriodsCounted: plan.due,
+                            lastEftiqad: actionLog
+                        });
+                    });
+                    await db.collection(COLLECTION_EFTIQAD).doc().set({
+                        ...actionLog,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    queueRender(['eftiqad']);
+                } catch (err) {
+                    alert('خطأ في تسجيل الإفتقاد: ' + err.message);
+                }
+            };
+
+            function renderStats() {
+                const mList = localCache.makhdomin;
+                const kList = localCache.khodam;
+                const activeWeeklyAttendance = mList.reduce((count, m) => count + (isAttendedInLast7Days(m.id) ? 1 : 0), 0);
+                const setText = (id, value) => { const el = document.getElementById(id); if (el) el.innerText = value; };
+                setText('stat-makhdomin-count', mList.length);
+                setText('stat-khodam-count', kList.length);
+                setText('stat-attendance-today', activeWeeklyAttendance);
+                STAGES.forEach(st => setText(`count-stage-${st}`, mList.filter(m => m.stage === st).length));
+            }
+
+            function ensurePaginationControls() {
+                let el = document.getElementById('makhdom-pagination');
+                if (el) return el;
+                const tbody = document.getElementById('makhdomin-table-body');
+                if (!tbody) return null;
+                const tableWrap = tbody.closest('[style*="overflow-x:auto"]');
+                if (!tableWrap) return null;
+                el = document.createElement('div');
+                el.id = 'makhdom-pagination';
+                el.style.cssText = 'display:flex;justify-content:center;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap;';
+                tableWrap.parentElement.appendChild(el);
+                return el;
+            }
+
+            function updatePagination(total) {
+                const el = ensurePaginationControls();
+                if (!el) return;
+                const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+                makhdomPage = Math.min(Math.max(1, makhdomPage), pages);
+                if (pages <= 1) { el.innerHTML = ''; return; }
+                el.innerHTML = `<button class="btn btn-primary btn-action" ${makhdomPage === 1 ? 'disabled' : ''} onclick="window.changeMakhdomPage(-1)">السابق</button>
+                    <span style="font-size:0.85rem;color:var(--text-muted);">صفحة ${makhdomPage} من ${pages} — ${total} مخدوم</span>
+                    <button class="btn btn-primary btn-action" ${makhdomPage === pages ? 'disabled' : ''} onclick="window.changeMakhdomPage(1)">التالي</button>`;
+            }
+
+            window.changeMakhdomPage = function(delta) {
+                makhdomPage += delta;
+                renderMakhdominTable();
+            };
+
+            window.debouncedRenderMakhdomin = function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    makhdomPage = 1;
+                    renderMakhdominTable();
+                }, 180);
+            };
+
+            window.renderMakhdominTable = function() {
+                const tbody = document.getElementById('makhdomin-table-body');
+                const searchEl = document.getElementById('makhdom-search');
+                const filterEl = document.getElementById('makhdom-filter-stage');
+                if (!tbody || !searchEl || !filterEl) return;
+                const search = searchEl.value.trim().toLowerCase();
+                const filterStage = filterEl.value;
+                const filtered = localCache.makhdomin.filter(m =>
+                    (filterStage === 'ALL' || m.stage === filterStage) &&
+                    ((m.name && m.name.toLowerCase().includes(search)) || String(m.code).includes(search))
+                );
+                const pages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+                makhdomPage = Math.min(makhdomPage, pages);
+                const start = (makhdomPage - 1) * PAGE_SIZE;
+                const visible = filtered.slice(start, start + PAGE_SIZE);
+                tbody.innerHTML = visible.map(m => {
+                    const phone = localCache.phones.get(m.id) || '-';
+                    return `<tr>
+                        <td><strong>${escapeHtml(m.code)}</strong></td>
+                        <td>${escapeHtml(m.name)}</td>
+                        <td><span class="badge">${escapeHtml(m.stage)}</span></td>
+                        <td>${escapeHtml(phone)}</td>
+                        <td><button class="btn btn-danger btn-action" onclick="window.deleteItem('makhdomin','${escapeHtml(m.id)}')"><i class="fa-solid fa-trash"></i></button></td>
+                    </tr>`;
+                }).join('');
+                updatePagination(filtered.length);
+            };
+
+            function renderKhodamTable() {
+                const tbody = document.getElementById('khodam-table-body');
+                if (!tbody) return;
+                tbody.innerHTML = localCache.khodam.map(k => `<tr>
+                    <td>${escapeHtml(k.name)}</td>
+                    <td>${escapeHtml(k.phone || '-')}</td>
+                    <td><span class="badge" style="background-color:#0284c7;">${escapeHtml(k.stage || 'كل المراحل')}</span></td>
+                    <td><button class="btn btn-danger btn-action" onclick="window.deleteItem('khodam','${escapeHtml(k.id)}')"><i class="fa-solid fa-trash"></i></button></td>
+                </tr>`).join('');
+            }
+
+            window.renderBirthdays = function() {
+                const container = document.getElementById('birthdays-list-container');
+                const filterEl = document.getElementById('birthday-filter-stage');
+                if (!container || !filterEl) return;
+                const filterStage = filterEl.value;
+                const currentMonth = new Date().getMonth() + 1;
+                const matches = localCache.makhdomin.filter(m => {
+                    if (!m.dob || typeof m.dob !== 'string') return false;
+                    const parts = m.dob.split('-');
+                    return parts.length >= 2 && parseInt(parts[1], 10) === currentMonth && (filterStage === 'ALL' || m.stage === filterStage);
+                });
+                container.innerHTML = matches.length ? matches.map(m => `<div class="search-result-item"><div><strong>${escapeHtml(m.name)}</strong><div style="font-size:0.8rem;color:var(--text-muted);">${escapeHtml(m.stage)} - تاريخ الميلاد: ${escapeHtml(m.dob)}</div></div></div>`).join('') : '<p style="color:var(--text-muted);text-align:center;font-size:0.85rem;padding:8px 0;">لا توجد أعياد ميلاد مسجلة لهذا الشهر حسب الفلتر.</p>';
+            };
+
+            function renderTodayAttendance() {
+                const container = document.getElementById('today-attendance-log');
+                if (!container) return;
+                const cutoff = shiftDateKey(-6);
+                const recentLogs = localCache.attendance.filter(a => a.date >= cutoff && a.date <= localDateKey());
+                const mMap = new Map(localCache.makhdomin.map(m => [m.id, m]));
+                container.innerHTML = recentLogs.map(a => {
+                    const m = mMap.get(a.makhdomId);
+                    if (!m) return '';
+                    return `<div class="search-result-item"><div><strong>${escapeHtml(m.name)} (${escapeHtml(m.stage)})</strong><div style="font-size:0.75rem;color:var(--text-muted);">التاريخ: ${escapeHtml(a.date)} - ${escapeHtml(a.time || '')}</div></div><span class="badge" style="background-color:var(--success);">حاضر</span></div>`;
+                }).join('') || '<p style="color:var(--text-muted);font-size:0.85rem;text-align:center;padding:8px 0;">لا توجد تسجيلات حضور خلال الـ 7 أيام الماضية.</p>';
+            }
+
+            function getLastEftiqad(m) {
+                if (m.lastEftiqad && m.lastEftiqad.recordType === 'action') return m.lastEftiqad;
+                const liveLog = localCache.eftiqadByMakhdom.get(m.id);
+                if (liveLog) return liveLog;
+                const old = Array.isArray(m.eftiqadLogs) ? m.eftiqadLogs.filter(x => x && x.recordType === 'action').slice(-1)[0] : null;
+                return old && typeof old === 'object' ? old : null;
+            }
+
+            window.renderEftiqadList = function() {
+                const pendingContainer = document.getElementById('eftiqad-pending-container');
+                const doneContainer = document.getElementById('eftiqad-done-container');
+                const filterEl = document.getElementById('eftiqad-filter-stage');
+                if (!pendingContainer || !doneContainer || !filterEl) return;
+                const filterStage = filterEl.value;
+                const nowMs = Date.now();
+
+                const pendingList = [];
+                const doneList = [];
+
+                for (const m of localCache.makhdomin) {
+                    if (filterStage !== 'ALL' && m.stage !== filterStage) continue;
+                    const missedWeeks = getMissedWeeks(m);
+                    const pendingAbsence = hasPendingAbsence(m);
+                    const phone = localCache.phones.get(m.id) || 'غير مسجل';
+                    const lastLog = getLastEftiqad(m);
+                    const isDoneRecently = !!lastLog && Number(lastLog.timestamp) >= nowMs - SEVEN_DAYS_MS;
+                    if (!pendingAbsence && !isDoneRecently) continue;
+                    const lastLogText = lastLog
+                        ? `آخر إجراء إفتقاد: [${escapeHtml(lastLog.type || '')}] بتاريخ [${escapeHtml(lastLog.dateStr || '')}]`
+                        : 'لم يُسجل إجراء إفتقاد مؤخراً';
+                    const item = { m, phone, lastLogText, missedWeeks };
+                    if (pendingAbsence) pendingList.push(item); else if (isDoneRecently) doneList.push(item);
+                }
+
+                const stat = document.getElementById('stat-eftiqad-count');
+                if (stat) stat.innerText = pendingList.length;
+
+                pendingContainer.innerHTML = pendingList.length ? pendingList.map(({m, phone, lastLogText, missedWeeks}) => `<div style="background-color:var(--bg-dark);border:1px solid var(--card-border);border-radius:8px;padding:12px;margin-bottom:10px;">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><div><strong>${escapeHtml(m.name)}</strong><div style="font-size:0.8rem;color:var(--text-muted);">${escapeHtml(m.stage)} - هاتف: ${escapeHtml(phone)}</div></div><span class="badge" style="background-color:var(--danger);">غياب ${missedWeeks} مرة</span></div>
+                    <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:10px;">${lastLogText}</div>
+                    <div style="display:flex;gap:6px;"><button class="btn btn-whatsapp btn-action" onclick="window.logEftiqadAction('${escapeHtml(m.id)}','الواتس')"><i class="fa-brands fa-whatsapp"></i> واتس</button><button class="btn btn-call btn-action" onclick="window.logEftiqadAction('${escapeHtml(m.id)}','الهاتف')"><i class="fa-solid fa-phone"></i> اتصال</button><button class="btn btn-visit btn-action" onclick="window.logEftiqadAction('${escapeHtml(m.id)}','الزيارة')"><i class="fa-solid fa-house-user"></i> زيارة</button></div>
+                </div>`).join('') : '<p style="color:var(--text-muted);text-align:center;font-size:0.85rem;padding:8px 0;">لا توجد أشخاص بحاجة إلى إفتقاد حالياً.</p>';
+
+                doneContainer.innerHTML = doneList.length ? doneList.map(({m, phone, lastLogText, missedWeeks}) => `<div style="background-color:var(--bg-dark);border:1px solid var(--card-border);border-radius:8px;padding:12px;margin-bottom:10px;opacity:0.85;">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><div><strong>${escapeHtml(m.name)}</strong><div style="font-size:0.8rem;color:var(--text-muted);">${escapeHtml(m.stage)} - هاتف: ${escapeHtml(phone)}</div></div><span class="badge" style="background-color:var(--success);">تم الإفتقاد • غياب ${missedWeeks} مرة</span></div>
+                    <div style="font-size:0.75rem;color:var(--accent-blue);">${lastLogText}</div>
+                </div>`).join('') : '<p style="color:var(--text-muted);text-align:center;font-size:0.85rem;padding:8px 0;">لا توجد سجلات إفتقاد مكتملة مؤخراً.</p>';
+            };
+
+            const reportMonthInput = document.getElementById('report-month');
+            const reportWeekStartInput = document.getElementById('report-week-start');
+            const nowForReport = new Date();
+            if (reportMonthInput) reportMonthInput.value = `${nowForReport.getFullYear()}-${String(nowForReport.getMonth() + 1).padStart(2, '0')}`;
+            if (reportWeekStartInput) reportWeekStartInput.value = shiftDateKey(-6);
+            [reportMonthInput, reportWeekStartInput].forEach(input => {
+                if (input) input.addEventListener('change', () => window.updateReportPeriodUI());
+            });
+            window.updateReportPeriodUI();
+            initRealtimeSync();
+            }
+        })();
+    </script>
+
+<script>
+(function(){
+  const gate=document.getElementById('auth-gate'), form=document.getElementById('auth-login-form'), msg=document.getElementById('auth-message'), logout=document.getElementById('auth-logout-btn');
+  function showError(e){msg.textContent=({
+    'auth/invalid-credential':'البريد الإلكتروني أو كلمة المرور غير صحيحين.',
+    'auth/user-not-found':'الحساب غير موجود.',
+    'auth/too-many-requests':'تم إيقاف المحاولات مؤقتًا.',
+    'auth/network-request-failed':'تعذر الاتصال.'
+  })[e.code] || ('خطأ: '+(e.message||e.code))}
+  const approvedUIDs = [
+    'I8wafVzQwgd3oSh3UvigdwPFZlg1','XGzog5wSONd9WfdhrGIOlhnByJE3',
+    '9k6KkR1UHIelp25iNoZIEuSAHlq2','Ko2CTXR70VNwvHo7KKFNqaSFtnz2',
+    'I99HcGa8m9Tb4iFV5uBRXr9OCcK2','0yARLIkZFcYInLZc1XtTTunuqHv2',
+    'DisTKIoYXLXwoWSCwarDakWWskv1','PGmQKX6aFsWx0Q1DGS0lYnAxiTj1',
+    'qwgb3GNfOocoP7l1OR4X2kzQYx53','7cxdrsjGXCY7q8BOxcy3VKgJKfX2'
+  ];
+  firebase.auth().onAuthStateChanged(async user=>{
+    if(user && approvedUIDs.includes(user.uid)){
+      gate.style.display='none';logout.style.display='block';
+    } else {
+      gate.style.display='flex';logout.style.display='none';
+      if(user){ await firebase.auth().signOut(); msg.textContent='هذا الحساب غير مصرح له.'; }
+    }
+  });
+  form.addEventListener('submit',async e=>{e.preventDefault();const b=document.getElementById('auth-login-btn');b.disabled=true;msg.style.color='#cbd5e1';msg.textContent='جاري تسجيل الدخول...';try{await firebase.auth().signInWithEmailAndPassword(document.getElementById('auth-email').value.trim(),document.getElementById('auth-password').value);location.reload()}catch(err){msg.style.color='#fca5a5';showError(err)}finally{b.disabled=false}});
+  logout.addEventListener('click',async()=>{if(confirm('هل تريد تسجيل الخروج؟')){await firebase.auth().signOut();location.reload()}});
+})();
+</script>
+
+</body>
+</html>
